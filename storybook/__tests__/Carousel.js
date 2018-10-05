@@ -138,6 +138,15 @@ describe("Slider", function() {
         });
     });
 
+    describe("componentDidUpdate", () => {
+        it("should unbind the events", () => {
+            componentInstance.resetPosition = jest.genMockFunction();
+            componentInstance.setState({swiping: false});
+            componentInstance.componentDidUpdate({}, {swiping: true});
+            expect(componentInstance.resetPosition.mock.calls.length).toBe(1);
+        });
+    });
+
     describe("componentWillUnmount", () => {
         beforeEach(() => {
             componentInstance.unbindEvents = jest.genMockFunction();
@@ -604,11 +613,6 @@ describe("Slider", function() {
             it('should set swiping to false', () => {
                 componentInstance.onSwipeEnd();
                 expect(componentInstance.state.swiping).toBe(false);
-            });
-            it('should revert back to inital position', () => {
-                componentInstance.resetPosition = jest.genMockFunction();
-                componentInstance.onSwipeEnd();
-                expect(componentInstance.resetPosition.mock.calls.length).toBe(1);
             });
             it('should start autoplay again', () => {
                 componentInstance.autoPlay = jest.genMockFunction();

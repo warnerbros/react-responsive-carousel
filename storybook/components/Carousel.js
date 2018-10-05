@@ -78,7 +78,8 @@ class Carousel extends Component {
             initialized: false,
             selectedItem: props.selectedItem,
             hasMount: false,
-            isMouseEntered: false
+            isMouseEntered: false,
+            autoPlay: props.autoPlay
         };
     }
 
@@ -96,18 +97,26 @@ class Carousel extends Component {
             this.moveTo(nextProps.selectedItem);
         }
 
-        if (nextProps.autoPlay !== this.props.autoPlay) {
-            if (nextProps.autoPlay) {
-                this.setupAutoPlay();
-            } else {
-                this.destroyAutoPlay();
-            }
+        if (nextProps.autoPlay !== this.state.autoPlay) {
+            this.setState({
+                autoPlay: nextProps.autoPlay
+            }, () => {
+                if (this.state.autoPlay) {
+                    this.setupAutoPlay();
+                } else {
+                    this.destroyAutoPlay();
+                }
+            });
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
         if (!prevProps.children && this.props.children && !this.state.initialized) {
             this.setupCarousel();
+        }
+        if (prevState.swiping && !this.state.swiping) {
+            // We stopped swiping, ensure we are heading to the new/current slide and not stuck
+            this.resetPosition();
         }
     }
 
@@ -141,7 +150,7 @@ class Carousel extends Component {
     setupCarousel () {
         this.bindEvents();
 
-        if (this.props.autoPlay && Children.count(this.props.children) > 1) {
+        if (this.state.autoPlay && Children.count(this.props.children) > 1) {
             this.setupAutoPlay();
         }
 
@@ -213,7 +222,7 @@ class Carousel extends Component {
     }
 
     autoPlay = () => {
-        if (!this.props.autoPlay || Children.count(this.props.children) <= 1) {
+        if (!this.state.autoPlay || Children.count(this.props.children) <= 1) {
             return;
         }
 
@@ -224,7 +233,7 @@ class Carousel extends Component {
     }
 
     clearAutoPlay = () => {
-        if (!this.props.autoPlay) {
+        if (!this.state.autoPlay) {
             return;
         }
 
@@ -336,7 +345,6 @@ class Carousel extends Component {
     }
 
     onSwipeEnd = () => {
-        this.resetPosition();
         this.setState({
             swiping: false
         });
@@ -397,11 +405,6 @@ class Carousel extends Component {
         return - index * 100;
     }
 
-    resetPosition = () => {
-        const currentPosition = this.getPosition(this.state.selectedItem) + '%';
-        this.setPosition(currentPosition);
-    }
-
     setPosition = (position) => {
         const list = ReactDOM.findDOMNode(this.listRef);
         [
@@ -414,6 +417,11 @@ class Carousel extends Component {
         ].forEach((prop) => {
             list.style[prop] = CSSTranslate(position, this.props.axis);
         });
+    }
+
+    resetPosition = () => {
+        const currentPosition = this.getPosition(this.state.selectedItem) + '%';
+        this.setPosition(currentPosition);
     }
 
     decrement = (positions) => {
@@ -442,7 +450,7 @@ class Carousel extends Component {
 
         // don't reset auto play when stop on hover is enabled, doing so will trigger a call to auto play more than once
         // and will result in the interval function not being cleared correctly.
-        if (this.props.autoPlay && this.state.isMouseEntered === false) {
+        if (this.state.autoPlay && this.state.isMouseEntered === false) {
             this.resetAutoPlay();
         }
     }

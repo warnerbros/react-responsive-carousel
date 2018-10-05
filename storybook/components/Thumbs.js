@@ -73,7 +73,7 @@ class Thumbs extends Component {
         this.itemsWrapperRef = node;
     }
 
-    setItemsListRef = node => {   
+    setItemsListRef = node => {
         this.itemsListRef = node;
     }
 
@@ -173,21 +173,22 @@ class Thumbs extends Component {
     }
 
     onSwipeMove = (deltaX) => {
-        const leftBoundry = 0;
+        const leftBoundary = 0;
 
         const currentPosition = - this.state.firstItem * this.state.itemSize;
-        const lastLeftBoundry = - this.state.visibleItems * this.state.itemSize;
+        const lastLeftBoundary = - this.state.visibleItems * this.state.itemSize;
 
         // prevent user from swiping left out of boundaries
-        if (currentPosition === leftBoundry && deltaX > 0) {
+        if (currentPosition === leftBoundary && deltaX > 0) {
             deltaX = 0;
         }
 
         // prevent user from swiping right out of boundaries
-        if (currentPosition === lastLeftBoundry && deltaX < 0) {
+        if (currentPosition === lastLeftBoundary && deltaX < 0) {
             deltaX = 0;
         }
 
+        const wrapperSize = this.itemsWrapperRef.clientWidth;
         const position = currentPosition + (100 / (wrapperSize / deltaX)) + '%';
 
         // if 3d isn't available we will use left to move
@@ -199,16 +200,16 @@ class Thumbs extends Component {
             'transform',
             'msTransform'
         ].forEach((prop) => {
-            list.style[prop] = CSSTranslate(position, this.props.axis);
+            this.itemsListRef.style[prop] = CSSTranslate(position, this.props.axis);
         });
     }
 
     slideRight = (positions) => {
-        this.moveTo(this.state.firstItem - (typeof positions === 'Number' ? positions : 1));
+        this.moveTo(this.state.firstItem - (typeof positions === 'number' ? positions : 1));
     }
 
     slideLeft = (positions) => {
-        this.moveTo(this.state.firstItem + (typeof positions === 'Number' ? positions : 1));
+        this.moveTo(this.state.firstItem + (typeof positions === 'number' ? positions : 1));
     }
 
     moveTo = (position) => {
