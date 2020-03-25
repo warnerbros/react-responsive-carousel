@@ -94,7 +94,7 @@
     "rootDir": "src"
   },
   "dependencies": {
-    "classnames": "^2.2.5",
+    "classnames": "^2.2.6",
     "prop-types": "^15.5.8",
     "react-easy-swipe": "^0.0.16"
   }
